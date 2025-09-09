@@ -95,19 +95,38 @@ def create_products():
 
 
 ######################################################################
-# L I S T   A L L   P R O D U C T S
+# L I S T   P R O D U C T S
 ######################################################################
 
 @app.route("/products", methods=["GET"])
 def list_products():
     """
-    List all Products
+    Returns a list of products
 
-    This endpoint lists all Products
+    This endpoint lists all Products with specified criteria
+    If no criteria is given, it returns all products
     """
-    app.logger.info("Request to list all Products")
-    fetched_products = Product.all()
-    product_list = [fetched_product.serialize() for fetched_product in fetched_products]
+    app.logger.info("Request to list Products")
+    result = []
+    name = request.args.get("name")
+    category = request.args.get("category")
+    available = request.args.get("available")
+
+    if name:
+        app.logger.info(f"Find by name: {name}")
+        products = Product.find_by_name(name)
+    elif category:
+        app.logger.info(f"Find by category: {category}")
+        category_value = getattr(Category, category.upper())
+        products = Product.find_by_category(category)
+    elif available:
+        app.logger.info(f"Find by available: {available}")
+        available_value = available.lower() in ["true", "yes", "available", "1"]
+        products = Product.find_by_availability(available_value)
+    else:
+        app.logger.info("Find all")
+        products = Product.all()
+    product_list = [product.serialize() for product in products]
     app.logger.info(f"Returned {len(product_list)} products")
     return product_list, status.HTTP_200_OK
 

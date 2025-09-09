@@ -24,11 +24,12 @@ Test cases can be run with the following:
   While debugging just these tests it's convenient to use this:
     nosetests --stop tests/test_service.py:TestProductService
 """
-import os
 import logging
+import os
 import random
 from decimal import Decimal
 from unittest import TestCase
+from urllib.parse import quote_plus
 from service import app
 from service.common import status
 from service.models import db, init_db, Product
@@ -216,6 +217,34 @@ class TestProductRoutes(TestCase):
         """It should not Delete a product that was not found"""
         response = self.client.delete(f"{BASE_URL}/2")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_list_all(self):
+        """It should list all products"""
+        test_batch_size = 5
+        products = self._create_products(test_batch_size)
+        response = self.client.get(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), test_batch_size)
+
+    def test_list_by_name(self):
+        """It should Query Products by name"""
+        test_batch_size = 5
+        products = self._create_products(test_batch_size)
+        random_test_product = products[random.randrange(0,test_batch_size)]
+        name_count = len(
+            [product for product in products if product.name == random_test_product.name]
+            )
+        response = self.client.get(
+            BASE_URL,
+            query_string=f"name={quote_plus(random_test_product.name)}"
+            )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), name_count)
+        for product in data:
+            self.assertEqual(product["name"], random_test_product.name)
+
 
 
     ######################################################################
