@@ -26,6 +26,7 @@ Test cases can be run with the following:
 """
 import os
 import logging
+import random
 from decimal import Decimal
 from unittest import TestCase
 from service import app
@@ -177,8 +178,44 @@ class TestProductRoutes(TestCase):
         response = self.client.get(f"{BASE_URL}/5")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_update_product(self):
+        """It should Update a product"""
+        test_description = "test description message"
+        product = ProductFactory()
+        response = self.client.post(BASE_URL, json=product.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        product_data = response.get_json()
+        product_data["description"] = test_description
+        response = self.client.put(f"{BASE_URL}/{product_data['id']}", json=product_data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.get_json()["description"], test_description)
+
+    def test_update_product_not_found(self):
+        """It should not Update a product that was not found"""
+        product = ProductFactory()
+        product_data = product.serialize()
+        response = self.client.put(f"{BASE_URL}/5", json=product_data)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_product(self):
+        """It should Delete a product"""
+        test_batch_size = 5
+        products = self._create_products(test_batch_size)
+        product_count = self.get_product_count()
+        random_test_product = products[random.randrange(0,product_count)]
+        response = self.client.delete(f"{BASE_URL}/{random_test_product.id}")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(response.data), 0)
+        response = self.client.get(f"{BASE_URL}/{random_test_product.id}")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        updated_count = self.get_product_count()
+        self.assertEqual(updated_count, product_count - 1)
 
 
+    def test_delete_product_not_found(self):
+        """It should not Delete a product that was not found"""
+        response = self.client.delete(f"{BASE_URL}/2")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
     ######################################################################
