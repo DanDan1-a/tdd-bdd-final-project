@@ -114,21 +114,22 @@ def list_products():
 
     if name:
         app.logger.info(f"Find by name: {name}")
-        products = Product.find_by_name(name)
+        result = Product.find_by_name(name)
     elif category:
         app.logger.info(f"Find by category: {category}")
         category_value = getattr(Category, category.upper())
-        products = Product.find_by_category(category_value)
+        result = Product.find_by_category(category_value)
     elif available:
         app.logger.info(f"Find by available: {available}")
         available_value = available.lower() in ["true", "yes", "available", "1"]
-        products = Product.find_by_availability(available_value)
+        result = Product.find_by_availability(available_value)
     else:
         app.logger.info("Find all")
-        products = Product.all()
-    product_list = [product.serialize() for product in products]
-    app.logger.info(f"Returned {len(product_list)} products")
-    return product_list, status.HTTP_200_OK
+        result = Product.all()
+    result_list = [product.serialize() for product in result]
+    app.logger.info(f"Returned {len(result_list)} products")
+    return result_list, status.HTTP_200_OK
+
 
 ######################################################################
 # R E A D   A   P R O D U C T
@@ -138,7 +139,7 @@ def list_products():
 def get_products(product_id):
     """
     Returns a Product based on its ID
-    
+
     This endpoint gets a product based on its ID
     """
     app.logger.info(f"Request to Read a Product with ID:{product_id}")
@@ -160,7 +161,7 @@ def get_products(product_id):
 def update_products(product_id):
     """
     Updates a Product with given ID
-    
+
     This endpoint updates a Product based on the ID and the body that is posted
     """
     app.logger.info(f"Request to Update a Product with ID:{product_id}")
@@ -185,7 +186,7 @@ def update_products(product_id):
 def delete_products(product_id):
     """
     Deletes a Product with given ID
-    
+
     This endpoint deletes a Product based on the ID
     """
     app.logger.info(f"Request to Delete a Product with ID:{product_id}")

@@ -175,7 +175,6 @@ class TestProductRoutes(TestCase):
 
     def test_get_product_not_found(self):
         """It should not Get a product that was not found """
-        test_product = self._create_products(1)[0]
         response = self.client.get(f"{BASE_URL}/5")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -203,7 +202,7 @@ class TestProductRoutes(TestCase):
         test_batch_size = 5
         products = self._create_products(test_batch_size)
         product_count = self.get_product_count()
-        random_test_product = products[random.randrange(0,product_count)]
+        random_test_product = products[random.randrange(0, product_count)]
         response = self.client.delete(f"{BASE_URL}/{random_test_product.id}")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(response.data), 0)
@@ -211,7 +210,6 @@ class TestProductRoutes(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         updated_count = self.get_product_count()
         self.assertEqual(updated_count, product_count - 1)
-
 
     def test_delete_product_not_found(self):
         """It should not Delete a product that was not found"""
@@ -221,7 +219,7 @@ class TestProductRoutes(TestCase):
     def test_list_all(self):
         """It should list all products"""
         test_batch_size = 5
-        products = self._create_products(test_batch_size)
+        self._create_products(test_batch_size)
         response = self.client.get(BASE_URL)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
@@ -231,7 +229,7 @@ class TestProductRoutes(TestCase):
         """It should Query products by name"""
         test_batch_size = 5
         products = self._create_products(test_batch_size)
-        random_test_product = products[random.randrange(0,test_batch_size)]
+        random_test_product = products[random.randrange(0, test_batch_size)]
         name_count = len(
             [product for product in products if product.name == random_test_product.name]
             )
@@ -249,11 +247,11 @@ class TestProductRoutes(TestCase):
         """It should Query products by category"""
         test_batch_size = 5
         products = self._create_products(test_batch_size)
-        random_category = products[random.randrange(0,test_batch_size)].category
+        random_category = products[random.randrange(0, test_batch_size)].category
         category_count = len(
             [product for product in products if product.category == random_category]
             )
-        
+
         response = self.client.get(
             BASE_URL,
             query_string=f"category={random_category.name}"
@@ -280,7 +278,7 @@ class TestProductRoutes(TestCase):
         self.assertEqual(len(data), available_count)
         for product in data:
             self.assertEqual(product["available"], True)
-        
+
         response = self.client.get(
             BASE_URL,
             query_string="available=false"
@@ -291,11 +289,9 @@ class TestProductRoutes(TestCase):
         for product in data:
             self.assertEqual(product["available"], False)
 
-
     ######################################################################
     # Utility functions
     ######################################################################
-
     def get_product_count(self):
         """save the current number of products"""
         response = self.client.get(BASE_URL)

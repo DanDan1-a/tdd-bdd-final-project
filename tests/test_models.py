@@ -289,12 +289,12 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(fetched_products.count(), count)
         for fetched_product in fetched_products:
             self.assertEqual(fetched_product.price, random_price)
-    
+
     def test_deserialization_empty_args(self):
         """Deserialization should handle empty arguments"""
         product = ProductFactory()
         self.assertRaises(DataValidationError, product.deserialize, None)
-    
+
     def test_deserialization_incorrect_category(self):
         """Deserialization should handle incorrect category type"""
         product = ProductFactory()
@@ -308,5 +308,3 @@ class TestProductModel(unittest.TestCase):
         product_data = product.serialize()
         product_data["available"] = "test"
         self.assertRaises(DataValidationError, product.deserialize, product_data)
-
-
