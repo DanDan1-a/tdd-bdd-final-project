@@ -18,6 +18,7 @@ Scenario: The server is running
 
 Scenario: Create a Product
     When I visit the "Home Page"
+    And I press the "Clear" button
     And I set the "Name" to "Hammer"
     And I set the "Description" to "Claw hammer"
     And I select "True" in the "Available" dropdown
@@ -38,3 +39,103 @@ Scenario: Create a Product
     And I should see "True" in the "Available" dropdown
     And I should see "Tools" in the "Category" dropdown
     And I should see "34.95" in the "Price" field
+
+Scenario: Read a Product
+    When I visit the "Home Page"
+    And I press the "Clear" button
+    And I set the "Name" to "Hat"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    When I copy the "Id" field
+    And I press the "Clear" button
+    And I paste the "Id" field
+    And I press the "Retrieve" button
+    Then I should see the message "Success"
+    And I should see "Hat" in the "Name" field
+    And I should see "A red fedora" in the "Description" field
+    And I should see "True" in the "Available" dropdown
+    And I should see "Cloths" in the "Category" dropdown
+    And I should see "59.95" in the "Price" field
+
+Scenario: Update a Product
+    When I visit the "Home Page"
+    And I press the "Clear" button
+    And I set the "Name" to "Shoes"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Blue shoes" in the "Description" field
+    When I set the "Description" to "Great running shoes"
+    And I press the "Update" button
+    Then I should see the message "Success"
+    When I copy the "Id" field
+    And I press the "Clear" button
+    And I paste the "Id" field
+    And I press the "Retrieve" button
+    Then I should see the message "Success"
+    And I should see "Shoes" in the "Name" field
+    And I should see "Great running shoes" in the "Description" field
+    And I should see "False" in the "Available" dropdown
+    And I should see "Cloths" in the "Category" dropdown
+    And I should see "120.50" in the "Price" field
+    When I press the "Clear" button
+    And I press the "Search" button
+    Then I should see "Shoes" in the results
+    And I should see "Great running shoes" in the results
+    And I should not see "Blue shoes" in the results
+
+Scenario: Delete a Product
+    When I visit the "Home Page"
+    And I press the "Clear" button
+    And I set the "Name" to "Shoes"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Blue shoes" in the "Description" field
+    When I copy the "Id" field
+    And I press the "Clear" button
+    And I paste the "Id" field
+    And I press the "Delete" button
+    Then I should see the message "Product has been deleted!"
+    When I press the "Clear" button
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should not see "Shoes" in the results
+
+Scenario: List all products
+    When I visit the "Home Page"
+    And I press the "Clear" button
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Hat" in the results
+    And I should see "Shoes" in the results
+    And I should see "Big Mac" in the results
+    And I should see "Sheets" in the results
+
+Scenario: Category based search
+    When I visit the "Home Page"
+    And I press the "Clear" button
+    And I select "Cloths" in the "Category" dropdown
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Hat" in the results
+    And I should see "Shoes" in the results
+    And I should not see "Big Mac" in the results
+    And I should not see "Sheets" in the results
+
+Scenario: Availability based search
+    When I visit the "Home Page"
+    And I press the "Clear" button
+    And I select "True" in the "Available" dropdown
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Hat" in the results
+    And I should see "Big Mac" in the results
+    And I should see "Sheets" in the results
+    And I should not see "Shoes" in the results
+
+Scenario: Name based search
+    When I visit the "Home Page"
+    And I press the "Clear" button
+    And I set the "Name" to "Shoes"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Shoes" in the results
